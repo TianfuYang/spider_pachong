@@ -78,7 +78,7 @@ class JianshuSpiderDownloaderMiddleware:
                 show_more.click()
 
         except Exception as e:
-            print('**出错了*&&&&&&******************', e)
+            print('**没有更多*&&&&&&******************', e)
 
         source = self.driver.page_source
         response = HtmlResponse(url=self.driver.current_url, body=source, request=request, encoding='utf8')
