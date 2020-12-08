@@ -1,0 +1,246 @@
+-- SQL常用操作小技巧
+
+--1、Tab键上的~ 即`键` 像python中的三引号一样里面的内容表示一个整体 有时候由于单词之前的符号会造成识别异常 加上就好了
+--2、数据库的命令要以分号结束然后回车执行
+
+-- 查看版本
+select version();
+
+-- 显示当前时间
+select now();
+
+
+-- 远程连接
+mysql -hip地址 -u用户名 -p密码
+
+-------------------------------某数据库层面类---------------------------                  
+
+-- 查看当前已有数据库 记得加s
+show databases;
+
+-- 创建数据库
+create database  数据库名 ;
+create database  数据库名 charset=utf8;
+
+-- 查看创建时命令
+show create database 数据库名;
+
+-- 删除数据库
+drop database 数据库名;
+
+-- 切换数据库   可以直接从一个库跳到另一个库
+use 数据库名;
+
+-- 查看当前选择的数据库 这里没有s 
+select database();
+
+
+
+
+
+
+
+-------------------------------数据表层面类---------------------------  
+
+-- 查看当前数据库中的表
+show tables;
+
+-- 表内的约束内容
+-- auto_increment表示自动增长
+
+-- 创建命令
+create table 表名(列名及类型还有约束，可以无序，期间内容用空格分隔。不同列用逗号分隔)
+-- 举例  enum枚举中的数据下标（索引）从1开始
+create table students(
+	id int auto_increment primary key,
+	sname varchar(10) not null default '保密',
+	gender enum('男','女','保密') default '未知',
+	high decimal(5,2)
+);
+
+-- 查看创建命令
+-- show create table 表名;
+show create table students;
+-- 查看表结构
+desc 表名;
+-- 重命名整体的表名
+rename table 原表名 to 新表名;
+
+-- 修改表结构
+alter table 表名 add|modify|change|drop 列名 类型;
+
+-- 增加表内字段：
+alter table students add birthday datetime;
+
+-- 修改表内某字段的约束 不用重新命名字段
+alter table students modify birthday date;
+-- 修改表内某字段的约束 并重新命名字段
+alter table students change birthday date default "2020-09-15";
+
+-- 删除表内字段
+alter table 表名 drop 列名;
+alter table students drop sname;
+
+-- 删除整个表 这里故意没加分号
+drop table 表名
+
+
+
+-------------------------------具体数据层面操作--增删改查-------------------------  
+
+-- 增加
+-- 1、全列插入：insert into 表名 values(所有的列的值 都要对应写上并用逗号分隔)
+insert into students values(1,'小梦','男',183.33);
+insert into students values(null,'小梦','男',183.33);
+insert into students values(default,'小梦','男',183.33);
+-- 枚举中的数据可以用下标表示
+insert into students values(null,'小梦','1',183.33);
+-- 可以同时整体插入多个 用逗号隔开就好
+insert into students values (1,'小梦','男',183.33),(9,'小明','男',168.77);
+
+-- 2、部分插入：insert into 表名(列名1,列名x,...) values(值1,值x...) 其余部分会按约束规则补齐 default 或者 null
+-- 可以同时插入多个 用逗号隔开就好
+insert into students (sname,gender) values('小梦','男');
+insert into students (sname,gender) values('小梦','男'),('小明','男');
+
+-- 删除
+-- 条件删除
+delete from 表名 where 条件
+-- 无差别全删 挡我者si
+-- delete from 表名
+
+-- 逻辑删除，本质就是修改操作update
+alter table students add isdelete bit default 0;
+-- 如果需要删除则
+update students isdelete=1 where ...;
+
+
+-- 修改
+-- 全列值修改 （慎用）
+update 表名 set 列1=值1,...
+-- 列中指定某些满足条件的值修改
+update 表名 set 列1=值1,... where 条件
+
+
+-- 查询
+-- 全部查询
+select * from 表名;
+-- 条件查询
+select * from 表名 where name = "小名";
+-- 指定字段查询
+select sname,gender from students where name ="小明";
+
+-- 指定字段查询 并对输出结果的列名重命名 这个别名出现在结果集中 输出顺序和查询顺序一样 
+select haha.sname as "姓名",haha.gender as "性别" from students as haha;
+select sname as "姓名",gender as "性别" from students where id < 9;
+
+--在select后面列前使用distinct可以消除重复的行
+select distinct gender from students;
+
+
+-- 条件查询
+-- 优先顺序：（ ）>>> not >>> 比较运算符 >>> 逻辑运算符(and > or)
+select * from 表名 where 条件;
+-- 1、比较运算符 和python基本一致
+
+--比较运算符 等于 =  大于 >  大于等于 >=  小于 <  小于等于 <=  不等于!=或 <>
+--举例：
+select * from students where id>3;
+
+--2、逻辑运算符  and or not
+--举例：
+select * from students where id>3 and gender=0;
+
+--3、模糊匹配查询
+-- like  rlike (后面写正则表达式)
+-- %表示任意多个任意字符
+-- _表示一个任意字符
+
+--举例：
+-- 查询姓杨的学生
+select * from students where sname like '杨%';
+-- 查询姓杨或叫 过 的学生
+select * from students where sname like '杨%' or sname like '%过%';
+--查询姓杨并且名字是一个字的学生
+select * from students where sname like '杨_';
+--查询名字至少两个字的同学
+select * from students where sname like '__%';
+--查询名字以杨开头以过结尾的同学
+select * from students where sname rlike "^杨.*过$";
+
+--4、范围匹配查询
+-- in表示在一个非连续的范围内 
+-- between ... and ...表示在一个连续的范围内
+
+-- 举例：
+-- 查询编号是1或3或8的学生
+select * from students where id in(1,3,8);
+-- 查询编号是3-8的学生
+select * from students where id between 3 and 8;
+-- 查询学生是3至8的男生
+select * from students where id between 3 and 8 and gender=1;
+-- 查询学生不是3至8的男生
+select * from students where id not between 3 and 8 and gender=1;
+--(下面这个不常用)
+select * from students where not id between 3 and 8 and gender=1;
+
+--5、空值查询 （null与' '是不同的）
+-- 语句有 is null 和 is not null
+-- 举例：
+-- 查询没有填写地址的学生
+select * from students where hometown is null;
+-- 查询填写了地址的学生
+select * from students where hometown is not null and gender=0;
+
+
+
+
+--排序查询
+-- 参考语句：
+select * from 表名 order by 列1 asc|desc,列2 asc|desc,...
+-- 举例：asc升序 desc 降序
+select * from students where gender=1  order by id desc;
+-- 在排序条件结果相同的排序条件下，可以再增加新的排序规则
+select * from students where gender=1  order by id desc,age asc;
+
+
+--聚合查询
+-- 为了快速得到统计数据，提供了5个聚合函数 count() max() min() sum() avg()
+-- 举例：
+select count(*) from students;
+select count(*) as 数量 from students;
+-- max(列)表示求此列的最大值
+select max(age) from students where gender=0;
+-- min(列)表示求此列的最小值
+select min(id) from students where isdelete=0;
+-- sum(列)表示求此列的和
+select sum(age) from students where gender=1;
+-- avg(列)表示求此列的平均值
+select avg(age) from students;
+select sum(age)/count(*) from students;
+--使用函数限制小数位 并四舍五入
+select round(sum(age)/count(*),2) from students;
+
+--分组查询
+-- 分组后的结果和去重差不多，但是能进行进一步的组内操作
+select 列1,列2,聚合... from 表名 group by 列1,列2,列3...
+-- 查询男女生总数
+select gender as 性别,count(*) from students group by gender;
+-- 使用having对分组后的数据进行进一步筛选  语法类似与where 但where是对原数据表进行的
+select 列1,列2,聚合... from 表名 group by 列1,列2,列3... having 列1,...聚合...
+-- 查询男生总人数
+select gender as 性别,count(*) from students group by gender having gender=1;
+-- 查询同种性别的总人数 和其中所有人姓名
+select gender as 性别,count(*) as 总人数 group_concat(name) from students group by gender;
+-- 查询同种性别里年龄平均超过30岁的总人数 和其中所有人姓名
+select gender as 性别,count(*)  group_concat(name) from students group by gender having avg(age)>20;
+-- 查询同种性别里年龄年龄大于20岁，且平均分数超过90分的总人数 和其中所有人姓名
+select gender as 性别,count(*)  group_concat(name) from students where age>20 group by gender having avg(scor)>90;
+
+
+
+--分页查询
+-- 限制每次显示的结果数 避免数据太多崩溃 推荐使用
+select * from 表名 limit start,count   start开始索引，count取几个 默认从0开始
+-- 一般不在查询语句里使用计算算式
+select * from students where isdelete=0 limit (n-1)*m,m
