@@ -5,8 +5,6 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
-import pymysql
 from twisted.enterprise import adbapi
 from pymysql import cursors
 
