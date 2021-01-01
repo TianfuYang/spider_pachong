@@ -6,7 +6,14 @@
 import scrapy
 
 
-class FangSpiderItem(scrapy.Item):
+class newFangSpiderItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    province = scrapy.Field()
+    city = scrapy.Field()
+    name = scrapy.Field()
+    price = scrapy.Field()
+    areas = scrapy.Field()
+    state = scrapy.Field()
+    style = scrapy.Field()
+    address = scrapy.Field()
+    ori_url = scrapy.Field()

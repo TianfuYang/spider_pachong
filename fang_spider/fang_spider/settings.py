@@ -46,15 +46,15 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
    # 'fang_spider.middlewares.FangSpiderSpiderMiddleware': 543,
-   'fang_spider.middlewares.FangSpiderDownloaderMiddleware': 300,
+   'fang_spider.middlewares.FangSpiderDownloaderMiddleware': 200,
 
 }
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'fang_spider.middlewares.FangSpiderDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+   'fang_spider.middlewares.FangSpiderDownloaderMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -64,9 +64,9 @@ SPIDER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'fang_spider.pipelines.FangSpiderPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'fang_spider.pipelines.newFangSpiderPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
