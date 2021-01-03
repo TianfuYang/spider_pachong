@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
-from jianshu_spider.items import JianshuSpiderItem
+# from ..items import JianshuSpiderItem
 
 
 class JsSpider(CrawlSpider):
@@ -14,6 +14,7 @@ class JsSpider(CrawlSpider):
     )
 
     def parse_detail(self, response):
+        print('new返回', type(response))
         title = response.xpath('//h1[@class="_1RuRku"]/text()').get()
         content = ''.join(response.xpath("//article[@class='_2rhmJa']//p/text()").getall())
         url = response.url
@@ -23,12 +24,12 @@ class JsSpider(CrawlSpider):
         print(title, url, '\n', content)
         print('*' * 20)
         print('**********', read, like_count)
-        item = JianshuSpiderItem(
-            title=title,
-            reader=read,
-            like_count=like_count,
-            content=content,
-            url=url,
-            subjects=subjects
-        )
-        yield item
+        # item = JianshuSpiderItem(
+        #     title=title,
+        #     reader=read,
+        #     like_count=like_count,
+        #     content=content,
+        #     url=url,
+        #     subjects=subjects
+        # )
+        # yield item
